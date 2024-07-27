@@ -16,16 +16,22 @@ function App() {
 
   const updateFeedback = feedbackType => {
     if (feedbackType === 'reset') {
-      setFeedbacks({
+      const resetFeedbacks = {
         good: 0,
         neutral: 0,
         bad: 0
-      });
+      };
+     setFeedbacks(resetFeedbacks);
+     localStorage.setItem('feedbackData', JSON.stringify(resetFeedbacks));
     } else {
-      setFeedbacks(prevState => ({
+      setFeedbacks(prevState => {
+       const updatedFeedbacks ={
         ...prevState,
         [feedbackType]: prevState[feedbackType] + 1
-      }));
+      };
+       localStorage.setItem('feedbackData', JSON.stringify(updatedFeedbacks));
+         return updatedFeedbacks;
+       });
     }
   };
 
@@ -37,12 +43,8 @@ function App() {
       setFeedbacks(JSON.parse(savedData));
     }
   }, []);
-  
+   
   useEffect(() => {
-    localStorage.setItem('feedbackData', JSON.stringify(feedbacks));
-  }, [feedbacks]);
-
-    useEffect(() => {
     const { good, neutral, bad } = feedbacks;
     const totalFeedback = good + neutral + bad;
 
