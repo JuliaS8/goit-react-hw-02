@@ -1,0 +1,10 @@
+.buttonsList {
+  display: flex;
+  gap: 7px;
+}
+
+.optionsButton {
+  width: 70px;
+  height: 30px;
+  font-size: 0.7em;
+}
