@@ -3,6 +3,7 @@ import Description from './components/Description/Description';
 import Options from './components/Options/Options';
 import Feedback from './components/Feedback/Feedback';
 import Container from './components/Container/Container';
+import Notification from './components/Notification/Notification';
 
 function App() {
   const [feedbacks, setFeedbacks] = useState({
@@ -11,46 +12,31 @@ function App() {
     bad: 0
   });
 
-  const [showButtonReset, setShowButtonReset] = useState(false);
-  const [showFeedbacks, setShowFeedbacks] = useState(false);
-
-  const updateFeedback = feedbackType => {
-    if (feedbackType === 'reset') {
-      const resetFeedbacks = {
-        good: 0,
-        neutral: 0,
-        bad: 0
-      };
-     setFeedbacks(resetFeedbacks);
-     localStorage.setItem('feedbackData', JSON.stringify(resetFeedbacks));
-    } else {
-      setFeedbacks(prevState => {
-       const updatedFeedbacks ={
-        ...prevState,
-        [feedbackType]: prevState[feedbackType] + 1
-      };
-       localStorage.setItem('feedbackData', JSON.stringify(updatedFeedbacks));
-         return updatedFeedbacks;
-       });
-    }
-  };
-
   useEffect(() => {
     const savedData = localStorage.getItem('feedbackData');
-    console.log(savedData);
-
     if (savedData) {
       setFeedbacks(JSON.parse(savedData));
     }
   }, []);
-   
-  useEffect(() => {
-    const { good, neutral, bad } = feedbacks;
-    const totalFeedback = good + neutral + bad;
 
-    setShowButtonReset(totalFeedback > 0);
-    setShowFeedbacks(totalFeedback > 0);
+  useEffect(() => {
+    localStorage.setItem('feedbackData', JSON.stringify(feedbacks));
   }, [feedbacks]);
+
+  const updateFeedback = feedbackType => {
+    if (feedbackType === 'reset') {
+      setFeedbacks({
+        good: 0,
+        neutral: 0,
+        bad: 0
+      });
+    } else {
+      setFeedbacks(prevState => ({
+        ...prevState,
+        [feedbackType]: prevState[feedbackType] + 1
+      }));
+    }
+  };
 
   const totalFeedback = feedbacks.good + feedbacks.neutral + feedbacks.bad;
   const positiveFeedback = totalFeedback === 0 ? 0 : Math.round((feedbacks.good / totalFeedback) * 100);
@@ -61,20 +47,23 @@ function App() {
         <Description />
       </Container>
       <Container>
-        <Options onFeedbackUpdate={updateFeedback} showButtonReset={showButtonReset} />
+        <Options onFeedbackUpdate={updateFeedback} showButtonReset={totalFeedback > 0} />
       </Container>
       <Container>
-        <Feedback
-          good={feedbacks.good}
-          neutral={feedbacks.neutral}
-          bad={feedbacks.bad }
-          totalFeedback={totalFeedback}
-          positiveFeedback={positiveFeedback}
-          showFeedbacks={showFeedbacks}
-        />
+        {totalFeedback > 0 ? (
+          <Feedback
+            good={feedbacks.good}
+            neutral={feedbacks.neutral}
+            bad={feedbacks.bad}
+            totalFeedback={totalFeedback}
+            positiveFeedback={positiveFeedback}
+          />
+        ) : (
+          <Notification />
+        )}
       </Container>
     </>
   );
-}
+};
 
 export default App;
