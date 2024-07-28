@@ -6,20 +6,14 @@ import Container from './components/Container/Container';
 import Notification from './components/Notification/Notification';
 
 function App() {
-  const [feedbacks, setFeedbacks] = useState({
-    good: 0,
-    neutral: 0,
-    bad: 0
+  const [feedbacks, setFeedbacks] = useState(() => {
+    const savedData = localStorage.getItem('feedbackData');
+    console.log('Loaded data from localStorage:', savedData);
+    return savedData ? JSON.parse(savedData) : { good: 0, neutral: 0, bad: 0 };
   });
 
   useEffect(() => {
-    const savedData = localStorage.getItem('feedbackData');
-    if (savedData) {
-      setFeedbacks(JSON.parse(savedData));
-    }
-  }, []);
-
-  useEffect(() => {
+    console.log('Saving feedbacks to localStorage:', feedbacks);
     localStorage.setItem('feedbackData', JSON.stringify(feedbacks));
   }, [feedbacks]);
 
